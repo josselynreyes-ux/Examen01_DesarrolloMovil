@@ -1,0 +1,92 @@
+# ADR-004: Organizar la app con una arquitectura Clean ligera
+
+#### Estado
+
+Aceptado
+
+#### Fecha
+
+2026-11-22
+
+#### Autor(es) y equipo
+
+Grupo 4: Amy Mishell Díaz Rosero, Josselyn Mabel Reyes Parrales, Ariana Elizabeth Villota Jácome
+
+#### Requisitos relacionados
+
+R9: separar presentación, lógica de negocio y acceso a datos.
+
+Condición técnica del examen: justificar la separación de páginas, servicios, modelos, validaciones y acceso a datos.
+
+#### Contexto
+
+La app tiene tres roles con muchas pantallas y reglas de negocio importantes, como la suma de votos. Hay que definir cómo se separa el código para que sea ordenado, fácil de probar y explicable en la defensa, sin perder tiempo en estructura. Criterios: cumplimiento de R9, facilidad de pruebas, cantidad de archivos y tiempo disponible.
+
+#### Alternativas consideradas
+
+| Alternativa | Ventajas | Desventajas |
+| --- | --- | --- |
+| Clean ligera (dominio, aplicación, infraestructura, presentación) | La lógica no depende de Supabase; casos de uso fáciles de probar | Más archivos que una arquitectura simple |
+| Capas simples (páginas, servicios, repositorios) | Rápida de armar y fácil de entender | La lógica queda más ligada a Supabase |
+| Clean completa en todas las acciones | Muy estricta y uniforme | Demasiados archivos para el plazo |
+| Todo dentro de las páginas | Lo más rápido al inicio | No cumple R9 y es difícil de probar |
+
+#### Decisión
+
+Se usa una arquitectura Clean ligera, con carpetas por rol en la presentación:
+
+src/app/
+ ├─ core/
+ │   ├─ domain/          → modelos, interfaces de repositorios, validadores
+ │   ├─ application/     → casos de uso (registrar-acta, crear-usuario...)
+ │   └─ infrastructure/  → repositorios con Supabase, cámara, GPS
+ └─ presentation/
+     ├─ auth/  ├─ provincial/  ├─ recinto/  └─ veedor/
+
+Las capas externas dependen de las internas, nunca al revés. El dominio define interfaces (por ejemplo, ActaRepository) y la infraestructura las implementa con Supabase.
+
+Hay casos de uso solo para las acciones principales: registrar acta, corregir acta, crear usuario y asignar veedor. Las consultas simples van directo al repositorio.
+
+Las páginas nunca importan Supabase.
+
+#### Consecuencias
+
+Beneficios: código ordenado; reglas de negocio que se pueden probar sin backend; si se cambia de backend, solo cambia la infraestructura.
+
+Obligaciones: respetar la dirección de dependencias y crear interfaces para los repositorios.
+
+Limitaciones: más archivos y más tiempo de configuración.
+
+Riesgo: si no se domina el patrón, se nota en la defensa.
+
+#### Verificación
+
+Ningún archivo de presentation/ ni de domain/ importa @supabase/supabase-js (se comprueba con una búsqueda en el proyecto). Los casos de uso tienen pruebas unitarias con repositorios simulados.
+
+#### Uso de IA
+
+Herramienta: Claude (Anthropic).
+
+Consulta realizada: explicar la arquitectura por capas y Clean, y proponer una estructura de carpetas.
+
+Respuesta sugerida: Clean ligera con casos de uso solo en las acciones principales.
+
+Aceptación/rechazo: aceptada; se descartó aplicar casos de uso a todas las acciones por el tiempo disponible.
+
+Verificación humana: [completar]
+
+#### Trazabilidad
+
+Commit del ADR: [enlace]
+
+Commit de implementación: [enlace]
+
+#### Consenso del equipo
+
+Argumentos por integrante: Amy: [completar] · Josselyn: [completar] · Ariana: [completar]
+
+Objeciones: se propuso una arquitectura por capas simple, más rápida de armar.
+
+Acuerdo final: Clean ligera, porque separa mejor la lógica del backend y facilita las pruebas, limitada a las acciones principales para no perder tiempo.
+
+Minuto del video: [mm:ss]
