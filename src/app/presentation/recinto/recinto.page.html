@@ -1,0 +1,485 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Control Electoral</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="bienvenida">
+
+    <h1>Panel de recinto</h1>
+
+    @if (perfil(); as usuario) {
+
+      <p>
+        Bienvenido, {{ usuario.nombres }}
+        {{ usuario.apellidos }}
+      </p>
+
+    }
+
+    @if (recinto(); as datos) {
+
+      <h2>{{ datos.nombre }}</h2>
+
+      <p>
+        {{ datos.provincia }} -
+        {{ datos.canton }} -
+        {{ datos.parroquia }}
+      </p>
+
+    }
+
+  </div>
+
+  @if (seccion() !== 'inicio') {
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      (click)="cambiarSeccion('inicio')"
+      [disabled]="guardando()"
+    >
+      Volver al panel
+    </ion-button>
+
+  }
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando información...</p>
+    </div>
+
+  } @else {
+
+    @if (seccion() === 'inicio') {
+
+      <div class="resumen">
+
+        <div class="dato">
+          <strong>{{ veedores().length }}</strong>
+          <span>Veedores</span>
+        </div>
+
+        <div class="dato">
+          <strong>{{ juntas().length }}</strong>
+          <span>JRV</span>
+        </div>
+
+        <div class="dato">
+          <strong>{{ asignaciones().length }}</strong>
+          <span>Asignadas</span>
+        </div>
+
+        <div class="dato">
+          <strong>{{ juntasDisponibles().length }}</strong>
+          <span>Sin asignar</span>
+        </div>
+
+      </div>
+
+      <ion-card
+        button="true"
+        (click)="cambiarSeccion('veedores')"
+      >
+        <ion-card-content>
+          <h2>Gestión de veedores</h2>
+          <p>Registrar y consultar veedores del recinto.</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card
+        button="true"
+        (click)="cambiarSeccion('juntas')"
+      >
+        <ion-card-content>
+          <h2>Juntas electorales</h2>
+          <p>Consultar las JRV y sus estados.</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card
+        button="true"
+        (click)="cambiarSeccion('asignaciones')"
+      >
+        <ion-card-content>
+          <h2>Asignación de JRV</h2>
+          <p>Asignar juntas a los veedores.</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="cargarDatos()"
+      >
+        Actualizar información
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        color="danger"
+        (click)="cerrarSesion()"
+      >
+        Cerrar sesión
+      </ion-button>
+
+    }
+
+    @if (seccion() === 'veedores') {
+
+      <h2>Gestión de veedores</h2>
+
+      @if (!mostrarFormulario()) {
+
+        <ion-button
+          expand="block"
+          (click)="nuevoVeedor()"
+        >
+          Registrar veedor
+        </ion-button>
+
+      }
+
+      @if (mostrarFormulario()) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>Nuevo veedor</h2>
+
+            <form
+              [formGroup]="formularioVeedor"
+              (ngSubmit)="guardarVeedor()"
+            >
+
+              <div class="campo">
+                <label>Cédula</label>
+                <ion-item>
+                  <ion-input
+                    formControlName="cedula"
+                    inputmode="numeric"
+                    maxlength="10">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <div class="campo">
+                <label>Nombres</label>
+                <ion-item>
+                  <ion-input
+                    formControlName="nombres">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <div class="campo">
+                <label>Apellidos</label>
+                <ion-item>
+                  <ion-input
+                    formControlName="apellidos">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <div class="campo">
+                <label>Teléfono</label>
+                <ion-item>
+                  <ion-input
+                    formControlName="telefono"
+                    type="tel"
+                    maxlength="10">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <div class="campo">
+                <label>Correo electrónico</label>
+                <ion-item>
+                  <ion-input
+                    formControlName="correo"
+                    type="email">
+                  </ion-input>
+                </ion-item>
+              </div>
+
+              <div class="informacion">
+
+                <p>
+                  <strong>Rol:</strong> Veedor
+                </p>
+
+                <p>
+                  <strong>Recinto:</strong>
+                  {{ recinto()?.nombre }}
+                </p>
+
+                <p>
+                  <strong>Contraseña inicial:</strong>
+                  Ecuador2026
+                </p>
+
+              </div>
+
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="formularioVeedor.invalid || guardando()"
+              >
+
+                @if (guardando()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                  Registrando...
+                } @else {
+                  Guardar veedor
+                }
+
+              </ion-button>
+
+              <ion-button
+                expand="block"
+                fill="outline"
+                type="button"
+                color="medium"
+                (click)="cancelarFormulario()"
+                [disabled]="guardando()"
+              >
+                Cancelar
+              </ion-button>
+
+            </form>
+
+          </ion-card-content>
+        </ion-card>
+
+      }
+
+      @for (veedor of veedores(); track veedor.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>
+              {{ veedor.nombres }}
+              {{ veedor.apellidos }}
+            </h2>
+
+            <p>Cédula: {{ veedor.cedula }}</p>
+            <p>Teléfono: {{ veedor.telefono }}</p>
+            <p>Correo: {{ veedor.correo }}</p>
+
+            @if (veedor.debe_cambiar_clave) {
+
+              <span class="estado pendiente">
+                Cambio de contraseña pendiente
+              </span>
+
+            } @else {
+
+              <span class="estado activo">
+                Contraseña actualizada
+              </span>
+
+            }
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>No existen veedores registrados.</p>
+
+      }
+
+    }
+
+    @if (seccion() === 'juntas') {
+
+      <h2>Juntas de mi recinto</h2>
+
+      @for (junta of juntas(); track junta.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>JRV {{ junta.numero_jrv }}</h2>
+
+            <p>Estado: {{ junta.estado }}</p>
+
+            <p>
+              <strong>Veedor:</strong>
+              {{ veedorAsignado(junta.id) }}
+            </p>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>No existen juntas registradas.</p>
+
+      }
+
+    }
+
+    @if (seccion() === 'asignaciones') {
+
+      <h2>Asignación de juntas</h2>
+
+      <ion-card>
+        <ion-card-content>
+
+          <form
+            [formGroup]="formularioAsignacion"
+            (ngSubmit)="asignarJunta()"
+          >
+
+            <div class="campo">
+
+              <label>Seleccionar veedor</label>
+
+              <ion-item>
+
+                <ion-select
+                  formControlName="veedor_id"
+                  placeholder="Seleccionar veedor"
+                >
+
+                  @for (veedor of veedores(); track veedor.id) {
+
+                    <ion-select-option [value]="veedor.id">
+
+                      {{ veedor.nombres }}
+                      {{ veedor.apellidos }}
+
+                    </ion-select-option>
+
+                  }
+
+                </ion-select>
+
+              </ion-item>
+
+            </div>
+
+            <div class="campo">
+
+              <label>Seleccionar JRV disponible</label>
+
+              <ion-item>
+
+                <ion-select
+                  formControlName="junta_id"
+                  placeholder="Seleccionar JRV"
+                >
+
+                  @for (junta of juntasDisponibles(); track junta.id) {
+
+                    <ion-select-option [value]="junta.id">
+                      JRV {{ junta.numero_jrv }}
+                    </ion-select-option>
+
+                  }
+
+                </ion-select>
+
+              </ion-item>
+
+            </div>
+
+            @if (juntasDisponibles().length === 0) {
+
+              <p>No existen JRV disponibles para asignar.</p>
+
+            }
+
+            @if (veedores().length === 0) {
+
+              <p>Primero debes registrar un veedor.</p>
+
+            }
+
+            <ion-button
+              expand="block"
+              type="submit"
+              [disabled]="formularioAsignacion.invalid || guardando()"
+            >
+
+              @if (guardando()) {
+                <ion-spinner name="crescent"></ion-spinner>
+                Procesando...
+              } @else {
+                Asignar junta
+              }
+
+            </ion-button>
+
+          </form>
+
+        </ion-card-content>
+      </ion-card>
+
+      <h2>Asignaciones activas</h2>
+
+      @for (asignacion of asignaciones(); track asignacion.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>
+              JRV {{ numeroJunta(asignacion.junta_id) }}
+            </h2>
+
+            <p>
+              <strong>Veedor:</strong>
+              {{ nombreVeedor(asignacion.veedor_id) }}
+            </p>
+
+            <span class="estado activo">
+              Asignación activa
+            </span>
+
+            <ion-button
+              expand="block"
+              color="danger"
+              fill="outline"
+              (click)="retirarAsignacion(asignacion)"
+              [disabled]="guardando()"
+            >
+              Retirar asignación
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>No existen asignaciones activas.</p>
+
+      }
+
+    }
+
+  }
+
+</ion-content>
