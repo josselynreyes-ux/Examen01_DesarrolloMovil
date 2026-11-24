@@ -1,0 +1,113 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Control Electoral</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="bienvenida">
+
+    <h1>Panel Provincial</h1>
+
+    @if (perfil(); as usuario) {
+
+      <p>
+        Bienvenido, {{ usuario.nombres }}
+        {{ usuario.apellidos }}
+      </p>
+
+    }
+
+  </div>
+
+  @if (mensajeError()) {
+
+    <p>{{ mensajeError() }}</p>
+
+  }
+
+  <div class="modulos">
+
+    <ion-card
+      button="true"
+      routerLink="/provincial/recintos"
+      class="tarjeta-click"
+    >
+      <ion-card-content>
+
+        <h2>Gestión de recintos</h2>
+
+        <p>
+          Consultar y administrar recintos electorales.
+        </p>
+
+        <span class="enlace">Ver recintos</span>
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card
+      button="true"
+      routerLink="/provincial/coordinadores"
+      class="tarjeta-click"
+    >
+      <ion-card-content>
+
+        <h2>Coordinadores de recinto</h2>
+
+        <p>Registrar y consultar coordinadores.</p>
+
+        <span class="enlace">Ver coordinadores</span>
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card
+      button="true"
+      routerLink="/provincial/organizaciones"
+      class="tarjeta-click"
+    >
+      <ion-card-content>
+
+        <h2>Organizaciones y candidatos</h2>
+
+        <p>
+          Registrar y administrar información electoral.
+        </p>
+
+        <span class="enlace">Ver organizaciones</span>
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card
+      button="true"
+      routerLink="/provincial/resultados"
+      class="tarjeta-click"
+    >
+      <ion-card-content>
+
+        <h2>Resultados electorales</h2>
+
+        <p>
+          Consultar votos, actas y resultados consolidados.
+        </p>
+
+        <span class="enlace">Ver resultados</span>
+
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <ion-button
+    expand="block"
+    color="danger"
+    (click)="cerrarSesion()"
+  >
+    Cerrar sesión
+  </ion-button>
+
+</ion-content>
