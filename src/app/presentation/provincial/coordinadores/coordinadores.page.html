@@ -1,0 +1,267 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Coordinadores de recinto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Gestión de coordinadores</h1>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="regresar()"
+    [disabled]="guardando()"
+  >
+    Volver al panel
+  </ion-button>
+
+  @if (!mostrarFormulario()) {
+
+    <ion-button
+      expand="block"
+      (click)="nuevoCoordinador()"
+      [disabled]="cargando() || guardando()"
+    >
+      Registrar coordinador
+    </ion-button>
+
+  }
+
+  @if (mostrarFormulario()) {
+
+    <ion-card>
+      <ion-card-content>
+
+        <h2>Nuevo coordinador</h2>
+
+        <form
+          [formGroup]="formulario"
+          (ngSubmit)="guardarCoordinador()"
+        >
+
+          <div class="campo">
+            <label>Cédula</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="cedula"
+                inputmode="numeric"
+                maxlength="10"
+                placeholder="Número de cédula">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Nombres</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="nombres">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Apellidos</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="apellidos">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Teléfono</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="telefono"
+                type="tel"
+                maxlength="10">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Correo electrónico</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="correo"
+                type="email">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Recinto asignado</label>
+
+            <ion-item>
+
+              <ion-select
+                formControlName="recinto_id"
+                placeholder="Seleccionar recinto"
+                interface="alert"
+              >
+
+                @for (recinto of recintos(); track recinto.id) {
+
+                  <ion-select-option [value]="recinto.id">
+                    {{ recinto.nombre }}
+                  </ion-select-option>
+
+                }
+
+              </ion-select>
+
+            </ion-item>
+          </div>
+
+          <div class="informacion">
+            <p>
+              <strong>Rol:</strong>
+              Coordinador de recinto
+            </p>
+
+            <p>
+              <strong>Contraseña inicial:</strong>
+              Ecuador2026
+            </p>
+
+            <p>
+              El usuario deberá cambiar su contraseña
+              al iniciar sesión.
+            </p>
+          </div>
+
+          <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="formulario.invalid || guardando()"
+          >
+
+            @if (guardando()) {
+
+              <ion-spinner name="crescent"></ion-spinner>
+              Registrando...
+
+            } @else {
+
+              Guardar coordinador
+
+            }
+
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="medium"
+            type="button"
+            (click)="cancelar()"
+            [disabled]="guardando()"
+          >
+            Cancelar
+          </ion-button>
+
+        </form>
+
+      </ion-card-content>
+    </ion-card>
+
+  }
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando coordinadores...</p>
+    </div>
+
+  } @else {
+
+    <h2>Coordinadores registrados</h2>
+
+    <p>Total: {{ coordinadores().length }}</p>
+
+    @for (coordinador of coordinadores(); track coordinador.id) {
+
+      <ion-card>
+        <ion-card-content>
+
+          <h2>
+            {{ coordinador.nombres }}
+            {{ coordinador.apellidos }}
+          </h2>
+
+          <p>
+            <strong>Cédula:</strong>
+            {{ coordinador.cedula }}
+          </p>
+
+          <p>
+            <strong>Correo:</strong>
+            {{ coordinador.correo }}
+          </p>
+
+          <p>
+            <strong>Teléfono:</strong>
+            {{ coordinador.telefono }}
+          </p>
+
+          <p>
+            <strong>Recinto:</strong>
+            {{ nombreRecinto(coordinador.recinto_id) }}
+          </p>
+
+          @if (coordinador.debe_cambiar_clave) {
+
+            <span class="estado pendiente">
+              Cambio de contraseña pendiente
+            </span>
+
+          } @else {
+
+            <span class="estado activo">
+              Contraseña actualizada
+            </span>
+
+          }
+
+        </ion-card-content>
+      </ion-card>
+
+    } @empty {
+
+      @if (!mensajeError()) {
+
+        <p>No existen coordinadores registrados.</p>
+
+      }
+
+    }
+
+  }
+
+</ion-content>
