@@ -1,0 +1,118 @@
+
+<ion-content class="login-content">
+
+  <div class="login-container">
+
+    <div class="login-card">
+
+      <div class="logo">
+
+        <h1>Control Electoral</h1>
+
+        <p>Sistema de gestión electoral</p>
+
+      </div>
+
+      <h2>Iniciar sesión</h2>
+
+      <form
+        [formGroup]="formulario"
+        (ngSubmit)="iniciarSesion()">
+
+        <div class="campo">
+
+          <label>Cédula</label>
+
+          <ion-item lines="none">
+
+            <ion-input
+              type="text"
+              inputmode="numeric"
+              maxlength="10"
+              placeholder="Ingresa tu cédula"
+              formControlName="cedula">
+            </ion-input>
+
+          </ion-item>
+
+          @if (
+            formulario.controls.cedula.invalid &&
+            formulario.controls.cedula.touched
+          ) {
+
+            <ion-text color="danger">
+
+              <small>
+                Ingresa una cédula de 10 dígitos.
+              </small>
+
+            </ion-text>
+
+          }
+
+        </div>
+
+        <div class="campo">
+
+          <label>Contraseña</label>
+
+          <ion-item lines="none">
+
+            <ion-input
+              type="password"
+              placeholder="Ingresa tu contraseña"
+              formControlName="contrasena">
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+        @if (mensajeError()) {
+
+          <ion-text color="danger">
+
+            <p class="mensaje-error">
+              {{ mensajeError() }}
+            </p>
+
+          </ion-text>
+
+        }
+
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="formulario.invalid || cargando()">
+
+          @if (cargando()) {
+
+            <ion-spinner name="crescent">
+            </ion-spinner>
+
+          } @else {
+
+            Iniciar sesión
+
+          }
+
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          fill="clear"
+          type="button"
+          [disabled]="cargando()"
+          (click)="recuperarContrasena()">
+
+          ¿Olvidaste tu contraseña?
+
+        </ion-button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</ion-content>
