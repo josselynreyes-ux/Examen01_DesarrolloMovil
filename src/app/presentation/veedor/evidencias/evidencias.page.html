@@ -1,0 +1,270 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Evidencias electorales</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Evidencias de actas</h1>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="regresar()"
+    [disabled]="ocupado()"
+  >
+    Volver al panel
+  </ion-button>
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando información...</p>
+    </div>
+
+  } @else {
+
+    @if (!actaSeleccionada()) {
+
+      <h2>Mis actas registradas</h2>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="cargarActas()"
+      >
+        Actualizar información
+      </ion-button>
+
+      @for (acta of actas(); track acta.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>
+              JRV {{ numeroJunta(acta.junta_id) }}
+            </h2>
+
+            <p>
+              Dignidad:
+              {{ acta.dignidad === 'alcalde'
+                ? 'Alcaldía'
+                : 'Prefectura' }}
+            </p>
+
+            <p>
+              Total sufragantes:
+              {{ acta.total_sufragantes }}
+            </p>
+
+            @if (
+              acta.foto_ruta &&
+              acta.latitud !== null &&
+              acta.longitud !== null
+            ) {
+
+              <span class="estado completo">
+                Evidencia registrada
+              </span>
+
+            } @else {
+
+              <span class="estado pendiente">
+                Evidencia pendiente
+              </span>
+
+            }
+
+            <ion-button
+              expand="block"
+              (click)="seleccionarActa(acta)"
+            >
+              Gestionar evidencia
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>Primero debes registrar un acta electoral.</p>
+
+      }
+
+    }
+
+    @if (actaSeleccionada(); as acta) {
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="cancelar()"
+        [disabled]="ocupado()"
+      >
+        Volver a las actas
+      </ion-button>
+
+      <h2>
+        JRV {{ numeroJunta(acta.junta_id) }} -
+        {{ acta.dignidad === 'alcalde'
+          ? 'Alcaldía'
+          : 'Prefectura' }}
+      </h2>
+
+      <ion-card>
+        <ion-card-content>
+
+          <h2>Fotografía del acta</h2>
+
+          @if (fotoPreview(); as foto) {
+
+            <img
+              class="foto"
+              [src]="foto"
+              alt="Fotografía del acta electoral"
+            />
+
+          } @else {
+
+            <div class="sin-foto">
+              No hay fotografía disponible
+            </div>
+
+          }
+
+          <ion-button
+            expand="block"
+            (click)="tomarFoto()"
+            [disabled]="ocupado()"
+          >
+
+            @if (capturando()) {
+
+              <ion-spinner name="crescent"></ion-spinner>
+              Abriendo cámara...
+
+            } @else {
+
+              Capturar fotografía
+
+            }
+
+          </ion-button>
+
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-content>
+
+          <h2>Ubicación geográfica</h2>
+
+          @if (ubicacion(); as gps) {
+
+            <div class="coordenadas">
+
+              <p>
+                <strong>Latitud:</strong>
+                {{ gps.latitud.toFixed(6) }}
+              </p>
+
+              <p>
+                <strong>Longitud:</strong>
+                {{ gps.longitud.toFixed(6) }}
+              </p>
+
+              <p>
+                <strong>Precisión:</strong>
+                {{ gps.precision.toFixed(1) }} metros
+              </p>
+
+            </div>
+
+          } @else if (
+            acta.latitud !== null &&
+            acta.longitud !== null
+          ) {
+
+            <p>Ubicación guardada anteriormente:</p>
+
+            <p>Latitud: {{ acta.latitud }}</p>
+            <p>Longitud: {{ acta.longitud }}</p>
+
+          } @else {
+
+            <p>Ubicación todavía no registrada.</p>
+
+          }
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            (click)="obtenerUbicacion()"
+            [disabled]="ocupado()"
+          >
+
+            @if (localizando()) {
+
+              <ion-spinner name="crescent"></ion-spinner>
+              Obteniendo ubicación...
+
+            } @else {
+
+              Obtener ubicación GPS
+
+            }
+
+          </ion-button>
+
+        </ion-card-content>
+      </ion-card>
+
+      <p>
+        Para guardar la evidencia debes capturar
+        una fotografía y obtener la ubicación actual.
+      </p>
+
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="guardarEvidencia()"
+        [disabled]="!puedeGuardar()"
+      >
+
+        @if (guardando()) {
+
+          <ion-spinner name="crescent"></ion-spinner>
+          Guardando evidencia...
+
+        } @else {
+
+          Guardar evidencia
+
+        }
+
+      </ion-button>
+
+    }
+
+  }
+
+</ion-content>
