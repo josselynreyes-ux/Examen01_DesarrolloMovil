@@ -1,0 +1,443 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Información electoral</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Organizaciones y candidatos</h1>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="regresar()"
+    [disabled]="guardando()"
+  >
+    Volver al panel
+  </ion-button>
+
+  <div class="resumen">
+
+    <div class="dato">
+      <strong>{{ organizaciones().length }}</strong>
+      <span>Organizaciones</span>
+    </div>
+
+    <div class="dato">
+      <strong>{{ candidatos().length }}</strong>
+      <span>Candidatos</span>
+    </div>
+
+    <div class="dato">
+      <strong>
+        {{ candidatosPorDignidad('alcalde').length }}
+      </strong>
+      <span>Alcaldía</span>
+    </div>
+
+    <div class="dato">
+      <strong>
+        {{ candidatosPorDignidad('prefecto').length }}
+      </strong>
+      <span>Prefectura</span>
+    </div>
+
+  </div>
+
+  <div class="navegacion">
+
+    <ion-button
+      expand="block"
+      [fill]="seccion() === 'organizaciones' ? 'solid' : 'outline'"
+      (click)="cambiarSeccion('organizaciones')"
+      [disabled]="guardando()"
+    >
+      Organizaciones
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      [fill]="seccion() === 'candidatos' ? 'solid' : 'outline'"
+      (click)="cambiarSeccion('candidatos')"
+      [disabled]="guardando()"
+    >
+      Candidatos
+    </ion-button>
+
+  </div>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="cargarDatos()"
+    [disabled]="cargando() || guardando()"
+  >
+    Actualizar información
+  </ion-button>
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando información...</p>
+    </div>
+
+  } @else {
+
+    @if (seccion() === 'organizaciones') {
+
+      <h2>Organizaciones políticas</h2>
+
+      @if (!mostrarFormulario()) {
+
+        <ion-button
+          expand="block"
+          (click)="nuevaOrganizacion()"
+        >
+          Registrar organización
+        </ion-button>
+
+      }
+
+      @if (mostrarFormulario()) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>
+              {{ organizacionEditando()
+                ? 'Editar organización'
+                : 'Nueva organización' }}
+            </h2>
+
+            <form
+              [formGroup]="formularioOrganizacion"
+              (ngSubmit)="guardarOrganizacion()"
+            >
+
+              <div class="campo">
+
+                <label>Nombre de la organización</label>
+
+                <ion-item>
+                  <ion-input
+                    formControlName="nombre"
+                    placeholder="Nombre completo">
+                  </ion-input>
+                </ion-item>
+
+              </div>
+
+              <div class="campo">
+
+                <label>Siglas</label>
+
+                <ion-item>
+                  <ion-input
+                    formControlName="siglas"
+                    placeholder="Siglas de la organización">
+                  </ion-input>
+                </ion-item>
+
+              </div>
+
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="formularioOrganizacion.invalid || guardando()"
+              >
+
+                @if (guardando()) {
+
+                  <ion-spinner name="crescent"></ion-spinner>
+                  Guardando...
+
+                } @else {
+
+                  Guardar organización
+
+                }
+
+              </ion-button>
+
+              <ion-button
+                expand="block"
+                fill="outline"
+                color="medium"
+                type="button"
+                (click)="cancelarFormulario()"
+                [disabled]="guardando()"
+              >
+                Cancelar
+              </ion-button>
+
+            </form>
+
+          </ion-card-content>
+        </ion-card>
+
+      }
+
+      @for (organizacion of organizaciones(); track organizacion.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <span class="siglas">
+              {{ organizacion.siglas }}
+            </span>
+
+            <h2>{{ organizacion.nombre }}</h2>
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="editarOrganizacion(organizacion)"
+              [disabled]="guardando() || mostrarFormulario()"
+            >
+              Editar organización
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>No existen organizaciones registradas.</p>
+
+      }
+
+    }
+
+    @if (seccion() === 'candidatos') {
+
+      <h2>Gestión de candidatos</h2>
+
+      @if (organizaciones().length === 0) {
+
+        <p class="mensaje-error">
+          Primero debes registrar una organización política.
+        </p>
+
+      }
+
+      @if (!mostrarFormulario()) {
+
+        <ion-button
+          expand="block"
+          (click)="nuevoCandidato()"
+          [disabled]="organizaciones().length === 0"
+        >
+          Registrar candidato
+        </ion-button>
+
+      }
+
+      @if (mostrarFormulario()) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>
+              {{ candidatoEditando()
+                ? 'Editar candidato'
+                : 'Nuevo candidato' }}
+            </h2>
+
+            <form
+              [formGroup]="formularioCandidato"
+              (ngSubmit)="guardarCandidato()"
+            >
+
+              <div class="campo">
+
+                <label>Nombre completo</label>
+
+                <ion-item>
+                  <ion-input
+                    formControlName="nombre"
+                    placeholder="Nombre del candidato">
+                  </ion-input>
+                </ion-item>
+
+              </div>
+
+              <div class="campo">
+
+                <label>Organización política</label>
+
+                <ion-item>
+
+                  <ion-select
+                    formControlName="organizacion_id"
+                    placeholder="Seleccionar organización"
+                  >
+
+                    @for (organizacion of organizaciones(); track organizacion.id) {
+
+                      <ion-select-option
+                        [value]="organizacion.id"
+                      >
+                        {{ organizacion.nombre }}
+                      </ion-select-option>
+
+                    }
+
+                  </ion-select>
+
+                </ion-item>
+
+              </div>
+
+              <div class="campo">
+
+                <label>Dignidad electoral</label>
+
+                <ion-item>
+
+                  <ion-select formControlName="dignidad">
+
+                    <ion-select-option value="alcalde">
+                      Alcalde
+                    </ion-select-option>
+
+                    <ion-select-option value="prefecto">
+                      Prefecto
+                    </ion-select-option>
+
+                  </ion-select>
+
+                </ion-item>
+
+              </div>
+
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="formularioCandidato.invalid || guardando()"
+              >
+
+                @if (guardando()) {
+
+                  <ion-spinner name="crescent"></ion-spinner>
+                  Guardando...
+
+                } @else {
+
+                  Guardar candidato
+
+                }
+
+              </ion-button>
+
+              <ion-button
+                expand="block"
+                fill="outline"
+                color="medium"
+                type="button"
+                (click)="cancelarFormulario()"
+                [disabled]="guardando()"
+              >
+                Cancelar
+              </ion-button>
+
+            </form>
+
+          </ion-card-content>
+        </ion-card>
+
+      }
+
+      <h2>Candidatos a la alcaldía</h2>
+
+      @for (candidato of candidatosPorDignidad('alcalde'); track candidato.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <span class="dignidad alcalde">
+              Alcaldía
+            </span>
+
+            <h2>{{ candidato.nombre }}</h2>
+
+            <p>
+              {{ nombreOrganizacion(candidato.organizacion_id) }}
+            </p>
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="editarCandidato(candidato)"
+              [disabled]="guardando() || mostrarFormulario()"
+            >
+              Editar candidato
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>No existen candidatos a la alcaldía.</p>
+
+      }
+
+      <h2>Candidatos a la prefectura</h2>
+
+      @for (candidato of candidatosPorDignidad('prefecto'); track candidato.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <span class="dignidad prefecto">
+              Prefectura
+            </span>
+
+            <h2>{{ candidato.nombre }}</h2>
+
+            <p>
+              {{ nombreOrganizacion(candidato.organizacion_id) }}
+            </p>
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="editarCandidato(candidato)"
+              [disabled]="guardando() || mostrarFormulario()"
+            >
+              Editar candidato
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <p>No existen candidatos a la prefectura.</p>
+
+      }
+
+    }
+
+  }
+
+</ion-content>
