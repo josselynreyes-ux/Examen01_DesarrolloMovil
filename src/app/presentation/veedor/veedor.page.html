@@ -1,0 +1,418 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Control Electoral</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="bienvenida">
+
+    <h1>Panel del veedor</h1>
+
+    @if (perfil(); as usuario) {
+
+      <p>
+        Bienvenido, {{ usuario.nombres }}
+        {{ usuario.apellidos }}
+      </p>
+
+    }
+
+    @if (recinto(); as datos) {
+
+      <h2>{{ datos.nombre }}</h2>
+
+      <p>
+        {{ datos.provincia }} -
+        {{ datos.canton }} -
+        {{ datos.parroquia }}
+      </p>
+
+    }
+
+  </div>
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando informaciÃ³n...</p>
+    </div>
+
+  } @else {
+
+    @if (!juntaSeleccionada()) {
+
+      <div class="resumen">
+
+        <div class="dato">
+          <strong>{{ juntas().length }}</strong>
+          <span>JRV asignadas</span>
+        </div>
+
+        <div class="dato">
+          <strong>{{ actas().length }}</strong>
+          <span>Actas registradas</span>
+        </div>
+
+      </div>
+
+      <h2>Mis juntas electorales</h2>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="cargarDatos()"
+      >
+        Actualizar informaciÃ³n
+      </ion-button>
+
+      @for (junta of juntas(); track junta.id) {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>JRV {{ junta.numero_jrv }}</h2>
+
+            <span
+              class="estado"
+              [class.pendiente]="junta.estado === 'pendiente'"
+              [class.registrada]="junta.estado === 'registrada'"
+              [class.corregida]="junta.estado === 'corregida'"
+            >
+              {{ junta.estado }}
+            </span>
+
+            <p>
+              AlcaldÃ­a:
+              {{ estadoActa(junta.id, 'alcalde') }}
+            </p>
+
+            <p>
+              Prefectura:
+              {{ estadoActa(junta.id, 'prefecto') }}
+            </p>
+
+            <ion-button
+              expand="block"
+              (click)="seleccionarJunta(junta)"
+            >
+              Gestionar actas
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      } @empty {
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>Sin juntas asignadas</h2>
+
+            <p>
+              El coordinador de recinto todavÃ­a
+              no te ha asignado una JRV.
+            </p>
+
+          </ion-card-content>
+        </ion-card>
+
+      }
+
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="irEvidencias()"
+      >
+        Gestionar evidencias
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        color="danger"
+        (click)="cerrarSesion()"
+      >
+        Cerrar sesiÃ³n
+      </ion-button>
+
+    }
+
+    @if (juntaSeleccionada(); as junta) {
+
+      @if (!mostrarActa()) {
+
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="volverJuntas()"
+          [disabled]="guardando()"
+        >
+          Volver a mis juntas
+        </ion-button>
+
+        <h2>Actas de la JRV {{ junta.numero_jrv }}</h2>
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>Acta de alcaldÃ­a</h2>
+
+            <p>
+              Estado:
+              {{ estadoActa(junta.id, 'alcalde') }}
+            </p>
+
+            <ion-button
+              expand="block"
+              (click)="abrirActa('alcalde')"
+              [disabled]="guardando()"
+            >
+              {{ obtenerActa(junta.id, 'alcalde')
+                ? 'Consultar o corregir acta'
+                : 'Registrar acta' }}
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>Acta de prefectura</h2>
+
+            <p>
+              Estado:
+              {{ estadoActa(junta.id, 'prefecto') }}
+            </p>
+
+            <ion-button
+              expand="block"
+              (click)="abrirActa('prefecto')"
+              [disabled]="guardando()"
+            >
+              {{ obtenerActa(junta.id, 'prefecto')
+                ? 'Consultar o corregir acta'
+                : 'Registrar acta' }}
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      }
+
+      @if (mostrarActa()) {
+
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="cancelarActa()"
+          [disabled]="guardando()"
+        >
+          Volver a las actas
+        </ion-button>
+
+        <h2>
+          {{ actaExistente() ? 'Corregir' : 'Registrar' }}
+          acta de
+          {{ dignidad() === 'alcalde'
+            ? 'alcaldÃ­a'
+            : 'prefectura' }}
+        </h2>
+
+        <p>JRV {{ junta.numero_jrv }}</p>
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>Votos por organizaciÃ³n</h2>
+
+            @for (voto of votos(); track voto.organizacion_id) {
+
+              <div class="campo">
+
+                <label>{{ voto.organizacion }}</label>
+
+                <p>{{ voto.candidato }}</p>
+
+                <ion-item>
+
+                  <ion-input
+                    type="number"
+                    min="0"
+                    step="1"
+                    [ngModel]="voto.votos"
+                    (ngModelChange)="actualizarVoto(
+                      voto.organizacion_id,
+                      $event
+                    )"
+                    [disabled]="guardando()">
+                  </ion-input>
+
+                </ion-item>
+
+              </div>
+
+            }
+
+            <div class="campo">
+
+              <label>Votos blancos</label>
+
+              <ion-item>
+                <ion-input
+                  type="number"
+                  min="0"
+                  step="1"
+                  [ngModel]="votosBlancos()"
+                  (ngModelChange)="votosBlancos.set(
+                    convertirNumero($event)
+                  )"
+                  [disabled]="guardando()">
+                </ion-input>
+              </ion-item>
+
+            </div>
+
+            <div class="campo">
+
+              <label>Votos nulos</label>
+
+              <ion-item>
+                <ion-input
+                  type="number"
+                  min="0"
+                  step="1"
+                  [ngModel]="votosNulos()"
+                  (ngModelChange)="votosNulos.set(
+                    convertirNumero($event)
+                  )"
+                  [disabled]="guardando()">
+                </ion-input>
+              </ion-item>
+
+            </div>
+
+            <div class="campo">
+
+              <label>Total de sufragantes</label>
+
+              <ion-item>
+                <ion-input
+                  type="number"
+                  min="0"
+                  step="1"
+                  [ngModel]="totalSufragantes()"
+                  (ngModelChange)="totalSufragantes.set(
+                    convertirNumero($event)
+                  )"
+                  [disabled]="guardando()">
+                </ion-input>
+              </ion-item>
+
+            </div>
+
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-content>
+
+            <h2>ValidaciÃ³n del acta</h2>
+
+            <div class="fila">
+              <span>Votos vÃ¡lidos</span>
+              <strong>{{ totalValidos() }}</strong>
+            </div>
+
+            <div class="fila">
+              <span>Votos blancos</span>
+              <strong>{{ votosBlancos() }}</strong>
+            </div>
+
+            <div class="fila">
+              <span>Votos nulos</span>
+              <strong>{{ votosNulos() }}</strong>
+            </div>
+
+            <div class="fila total">
+              <span>Total calculado</span>
+              <strong>{{ totalCalculado() }}</strong>
+            </div>
+
+            <div class="fila">
+              <span>Total sufragantes</span>
+              <strong>{{ totalSufragantes() }}</strong>
+            </div>
+
+            <div class="fila">
+              <span>Diferencia</span>
+              <strong>{{ diferencia() }}</strong>
+            </div>
+
+            @if (formularioValido()) {
+
+              <p class="mensaje-exito">
+                Los valores ingresados son correctos.
+              </p>
+
+            } @else {
+
+              <p class="mensaje-error">
+                Ingresa nÃºmeros enteros no negativos
+                y verifica que la suma coincida
+                con el total de sufragantes.
+              </p>
+
+            }
+
+            <ion-button
+              expand="block"
+              color="success"
+              (click)="guardarActa()"
+              [disabled]="!formularioValido() || guardando()"
+            >
+
+              @if (guardando()) {
+
+                <ion-spinner name="crescent"></ion-spinner>
+                Guardando...
+
+              } @else {
+
+                {{ actaExistente()
+                  ? 'Guardar correcciÃ³n'
+                  : 'Guardar acta' }}
+
+              }
+
+            </ion-button>
+
+          </ion-card-content>
+        </ion-card>
+
+      }
+
+    }
+
+  }
+
+</ion-content>
