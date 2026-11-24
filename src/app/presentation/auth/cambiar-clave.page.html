@@ -1,0 +1,73 @@
+
+<ion-content class="cambiar-content">
+
+  <div class="contenedor">
+
+    <div class="tarjeta">
+
+      <h1>Cambiar contraseña</h1>
+
+      <p>
+        Por seguridad, debes cambiar tu
+        contraseña inicial antes de continuar.
+      </p>
+
+      <form
+        [formGroup]="formulario"
+        (ngSubmit)="cambiarClave()"
+      >
+
+        <div class="campo">
+          <label>Nueva contraseña</label>
+
+          <ion-item lines="none">
+            <ion-input
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              formControlName="nuevaClave">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="campo">
+          <label>Confirmar contraseña</label>
+
+          <ion-item lines="none">
+            <ion-input
+              type="password"
+              placeholder="Repite tu contraseña"
+              formControlName="confirmarClave">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <ion-text color="danger" *ngIf="mensajeError">
+          <p>{{ mensajeError }}</p>
+        </ion-text>
+
+        <ion-text color="success" *ngIf="mensajeExito">
+          <p>{{ mensajeExito }}</p>
+        </ion-text>
+
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="formulario.invalid || cargando"
+        >
+          <ion-spinner
+            *ngIf="cargando"
+            name="crescent">
+          </ion-spinner>
+
+          <span *ngIf="!cargando">
+            Actualizar contraseña
+          </span>
+        </ion-button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</ion-content>
