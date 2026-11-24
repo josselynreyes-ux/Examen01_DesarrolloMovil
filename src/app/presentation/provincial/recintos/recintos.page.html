@@ -1,0 +1,267 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de recintos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Recintos electorales</h1>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="regresar()"
+    [disabled]="guardando() || generandoId() !== null"
+  >
+    Volver al panel
+  </ion-button>
+
+  @if (!mostrarFormulario()) {
+
+    <ion-button
+      expand="block"
+      (click)="nuevoRecinto()"
+      [disabled]="cargando() || guardando() || generandoId() !== null"
+    >
+      Registrar nuevo recinto
+    </ion-button>
+
+  }
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="cargarRecintos()"
+    [disabled]="cargando() || guardando() || generandoId() !== null"
+  >
+    Actualizar recintos
+  </ion-button>
+
+  @if (mostrarFormulario()) {
+
+    <ion-card>
+      <ion-card-content>
+
+        <h2>
+          {{ recintoEditando()
+            ? 'Editar recinto'
+            : 'Registrar recinto' }}
+        </h2>
+
+        <form
+          [formGroup]="formulario"
+          (ngSubmit)="guardarRecinto()"
+        >
+
+          <div class="campo">
+            <label>Nombre del recinto</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="nombre"
+                placeholder="Nombre del recinto">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Provincia</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="provincia">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Cantón</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="canton">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Parroquia</label>
+
+            <ion-item>
+              <ion-input
+                formControlName="parroquia"
+                placeholder="Parroquia">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="campo">
+            <label>Cantidad de JRV</label>
+
+            <ion-item>
+              <ion-input
+                type="number"
+                min="1"
+                step="1"
+                formControlName="cantidad_jrv">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <p class="ayuda">
+            Si aumentas la cantidad de JRV,
+            utiliza el botón Generar JRV
+            para crear las faltantes.
+          </p>
+
+          <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="guardando() || formulario.invalid"
+          >
+
+            @if (guardando()) {
+
+              <ion-spinner name="crescent"></ion-spinner>
+              <span>Guardando...</span>
+
+            } @else {
+
+              {{ recintoEditando()
+                ? 'Guardar cambios'
+                : 'Registrar recinto' }}
+
+            }
+
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="medium"
+            type="button"
+            (click)="cancelarFormulario()"
+            [disabled]="guardando()"
+          >
+            Cancelar
+          </ion-button>
+
+        </form>
+
+      </ion-card-content>
+    </ion-card>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando recintos...</p>
+    </div>
+
+  } @else {
+
+    @for (recinto of recintos(); track recinto.id) {
+
+      <ion-card>
+        <ion-card-content>
+
+          <h2>{{ recinto.nombre }}</h2>
+
+          <p>
+            <strong>Provincia:</strong>
+            {{ recinto.provincia }}
+          </p>
+
+          <p>
+            <strong>Cantón:</strong>
+            {{ recinto.canton }}
+          </p>
+
+          <p>
+            <strong>Parroquia:</strong>
+            {{ recinto.parroquia }}
+          </p>
+
+          <p>
+            <strong>Cantidad de JRV:</strong>
+            {{ recinto.cantidad_jrv }}
+          </p>
+
+          <div class="acciones">
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="editarRecinto(recinto)"
+              [disabled]="guardando() || generandoId() !== null || mostrarFormulario()"
+            >
+              Editar recinto
+            </ion-button>
+
+            <ion-button
+              expand="block"
+              color="success"
+              (click)="generarJuntas(recinto)"
+              [disabled]="generandoId() !== null || guardando() || mostrarFormulario()"
+            >
+
+              @if (generandoId() === recinto.id) {
+
+                <ion-spinner name="crescent"></ion-spinner>
+                <span>Generando...</span>
+
+              } @else {
+
+                Generar JRV
+
+              }
+
+            </ion-button>
+
+            <ion-button
+              expand="block"
+              color="secondary"
+              (click)="verJuntas(recinto)"
+              [disabled]="generandoId() !== null || guardando() || mostrarFormulario()"
+            >
+              Ver JRV
+            </ion-button>
+
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+
+    } @empty {
+
+      @if (!mensajeError()) {
+
+        <p>No existen recintos registrados.</p>
+
+      }
+
+    }
+
+  }
+
+</ion-content>
