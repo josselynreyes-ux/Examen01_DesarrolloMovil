@@ -1,0 +1,125 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Juntas electorales</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="regresar()"
+  >
+    Volver a recintos
+  </ion-button>
+
+  @if (cargando()) {
+
+    <div class="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando juntas...</p>
+    </div>
+
+  }
+
+  @if (mensajeError()) {
+
+    <div class="mensaje-error">
+
+      <p>{{ mensajeError() }}</p>
+
+      <ion-button
+        expand="block"
+        (click)="cargarJuntas()"
+        [disabled]="cargando()"
+      >
+        Reintentar
+      </ion-button>
+
+    </div>
+
+  }
+
+  @if (!cargando() && !mensajeError()) {
+
+    @if (recinto(); as datosRecinto) {
+
+      <ion-card class="informacion">
+        <ion-card-content>
+
+          <h1>{{ datosRecinto.nombre }}</h1>
+
+          <p>
+            {{ datosRecinto.provincia }} -
+            {{ datosRecinto.canton }} -
+            {{ datosRecinto.parroquia }}
+          </p>
+
+          <div class="resumen">
+
+            <div class="dato">
+              <strong>
+                {{ datosRecinto.cantidad_jrv }}
+              </strong>
+              <span>JRV previstas</span>
+            </div>
+
+            <div class="dato">
+              <strong>{{ juntas().length }}</strong>
+              <span>JRV registradas</span>
+            </div>
+
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+
+    }
+
+    <h2>Listado de juntas</h2>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      (click)="cargarJuntas()"
+    >
+      Actualizar juntas
+    </ion-button>
+
+    @for (junta of juntas(); track junta.id) {
+
+      <ion-card>
+        <ion-card-content class="junta">
+
+          <div>
+            <h3>JRV {{ junta.numero_jrv }}</h3>
+            <p>Junta Receptora del Voto</p>
+          </div>
+
+          <span
+            class="estado"
+            [class.pendiente]="junta.estado === 'pendiente'"
+            [class.registrada]="junta.estado === 'registrada'"
+            [class.corregida]="junta.estado === 'corregida'"
+          >
+            {{ junta.estado | titlecase }}
+          </span>
+
+        </ion-card-content>
+      </ion-card>
+
+    } @empty {
+
+      <ion-card>
+        <ion-card-content>
+          Este recinto todavía no tiene JRV registradas.
+        </ion-card-content>
+      </ion-card>
+
+    }
+
+  }
+
+</ion-content>
