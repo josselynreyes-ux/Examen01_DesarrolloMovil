@@ -1,0 +1,436 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de actas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Actas electorales</h1>
+
+  <p>Consulta y corrección de actas de tu recinto.</p>
+
+  <ion-button
+    expand="block"
+    fill="outline"
+    (click)="regresar()"
+    [disabled]="guardando()"
+  >
+    Volver al panel
+  </ion-button>
+
+  @if (mensajeError()) {
+
+    <p class="mensaje-error">
+      {{ mensajeError() }}
+    </p>
+
+  }
+
+  @if (mensajeExito()) {
+
+    <p class="mensaje-exito">
+      {{ mensajeExito() }}
+    </p>
+
+  }
+
+  @if (cargando()) {
+
+    <div class="cargando">
+
+      <ion-spinner name="crescent"></ion-spinner>
+
+      <p>Cargando información...</p>
+
+    </div>
+
+  } @else {
+
+    @if (!actaSeleccionada()) {
+
+      <div class="resumen">
+
+        <strong>{{ actas().length }}</strong>
+
+        <span>Actas registradas en el recinto</span>
+
+      </div>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="cargarDatos()"
+      >
+        Actualizar actas
+      </ion-button>
+
+      @for (acta of actas(); track acta.id) {
+
+        <ion-card>
+
+          <ion-card-content>
+
+            <h2>JRV {{ numeroJunta(acta.junta_id) }}</h2>
+
+            <p>
+              <strong>Dignidad:</strong>
+
+              {{ acta.dignidad === 'alcalde'
+                ? 'Alcaldía'
+                : 'Prefectura' }}
+            </p>
+
+            <p>
+              <strong>Sufragantes:</strong>
+              {{ acta.total_sufragantes }}
+            </p>
+
+            <span
+              class="estado"
+              [class.corregida]="acta.estado === 'corregida'"
+            >
+              {{ acta.estado }}
+            </span>
+
+            <p>
+              Fotografía:
+              {{ acta.foto_ruta
+                ? 'Registrada'
+                : 'Pendiente' }}
+            </p>
+
+            <ion-button
+              expand="block"
+              (click)="abrirActa(acta)"
+            >
+              Consultar y corregir
+            </ion-button>
+
+          </ion-card-content>
+
+        </ion-card>
+
+      } @empty {
+
+        <p class="informacion">
+          No existen actas registradas en este recinto.
+        </p>
+
+      }
+
+    }
+
+    @if (actaSeleccionada(); as acta) {
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="medium"
+        (click)="volverListado()"
+        [disabled]="guardando()"
+      >
+        Volver al listado de actas
+      </ion-button>
+
+      <ion-card>
+
+        <ion-card-content>
+
+          <h2>JRV {{ numeroJunta(acta.junta_id) }}</h2>
+
+          <p>
+            Dignidad:
+            {{ acta.dignidad === 'alcalde'
+              ? 'Alcaldía'
+              : 'Prefectura' }}
+          </p>
+
+          <span
+            class="estado"
+            [class.corregida]="acta.estado === 'corregida'"
+          >
+            {{ acta.estado }}
+          </span>
+
+        </ion-card-content>
+
+      </ion-card>
+
+      <ion-card>
+
+        <ion-card-content>
+
+          <h2>Corrección de votos</h2>
+
+          <form
+            [formGroup]="formulario"
+            (ngSubmit)="guardarCorreccion()"
+          >
+
+            <div formArrayName="votos">
+
+              @for (
+                candidato of candidatosActa();
+                track candidato.id;
+                let i = $index
+              ) {
+
+                <div class="campo">
+
+                  <label>
+                    {{ nombreOrganizacion(
+                      candidato.organizacion_id
+                    ) }}
+                  </label>
+
+                  <p>{{ candidato.nombre }}</p>
+
+                  <ion-item>
+
+                    <ion-input
+                      type="number"
+                      inputmode="numeric"
+                      min="0"
+                      step="1"
+                      [formControlName]="i"
+                      (ionInput)="calcularTotal()"
+                    >
+                    </ion-input>
+
+                  </ion-item>
+
+                </div>
+
+              }
+
+            </div>
+
+            <div class="campo">
+
+              <label>Votos nulos</label>
+
+              <ion-item>
+
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  step="1"
+                  formControlName="votos_nulos"
+                  (ionInput)="calcularTotal()"
+                >
+                </ion-input>
+
+              </ion-item>
+
+            </div>
+
+            <div class="campo">
+
+              <label>Votos blancos</label>
+
+              <ion-item>
+
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  step="1"
+                  formControlName="votos_blancos"
+                  (ionInput)="calcularTotal()"
+                >
+                </ion-input>
+
+              </ion-item>
+
+            </div>
+
+            <div class="campo">
+
+              <label>Total sufragantes</label>
+
+              <ion-item>
+
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  step="1"
+                  formControlName="total_sufragantes"
+                  (ionInput)="calcularTotal()"
+                >
+                </ion-input>
+
+              </ion-item>
+
+            </div>
+
+            <div class="validacion">
+
+              <div class="fila">
+
+                <span>Total calculado</span>
+
+                <strong>{{ totalCalculado() }}</strong>
+
+              </div>
+
+              <div class="fila">
+
+                <span>Diferencia</span>
+
+                <strong>{{ diferencia() }}</strong>
+
+              </div>
+
+            </div>
+
+            @if (formularioValido()) {
+
+              <p class="mensaje-exito">
+                La suma de votos es correcta.
+              </p>
+
+            } @else {
+
+              <p class="mensaje-error">
+                Verifica que los valores sean enteros
+                no negativos y que la suma coincida
+                con el total de sufragantes.
+              </p>
+
+            }
+
+            <ion-button
+              expand="block"
+              type="submit"
+              [disabled]="!formularioValido() || guardando()"
+            >
+
+              @if (guardando()) {
+
+                <ion-spinner name="crescent"></ion-spinner>
+
+                Procesando...
+
+              } @else {
+
+                Guardar corrección
+
+              }
+
+            </ion-button>
+
+          </form>
+
+        </ion-card-content>
+
+      </ion-card>
+
+      <ion-card>
+
+        <ion-card-content>
+
+          <h2>Evidencia fotográfica</h2>
+
+          @if (fotoUrl()) {
+
+            <img
+              class="fotografia"
+              [src]="fotoUrl()"
+              alt="Fotografía del acta electoral"
+            />
+
+          } @else {
+
+            <div class="sin-foto">
+              No existe una fotografía disponible.
+            </div>
+
+          }
+
+          @if (nuevaFoto()) {
+
+            <p class="informacion">
+              Nueva fotografía pendiente de guardar.
+            </p>
+
+          }
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            (click)="capturarFoto()"
+            [disabled]="guardando()"
+          >
+            {{ acta.foto_ruta
+              ? 'Reemplazar fotografía'
+              : 'Capturar fotografía' }}
+          </ion-button>
+
+          <h2>Ubicación GPS</h2>
+
+          @if (
+            latitud() !== null &&
+            longitud() !== null
+          ) {
+
+            <div class="coordenadas">
+
+              <p>
+                <strong>Latitud:</strong>
+                {{ latitud() }}
+              </p>
+
+              <p>
+                <strong>Longitud:</strong>
+                {{ longitud() }}
+              </p>
+
+            </div>
+
+          } @else {
+
+            <p>No existen coordenadas registradas.</p>
+
+          }
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            (click)="obtenerUbicacion()"
+            [disabled]="guardando()"
+          >
+            Obtener ubicación GPS
+          </ion-button>
+
+          <p class="nota">
+            Si solamente reemplazas la fotografía,
+            puedes conservar las coordenadas originales.
+            Actualiza la ubicación únicamente si corresponde
+            al lugar de captura del acta.
+          </p>
+
+          <ion-button
+            expand="block"
+            (click)="guardarFotografia()"
+            [disabled]="
+              !nuevaFoto() ||
+              guardando() ||
+              latitud() === null ||
+              longitud() === null
+            "
+          >
+            Guardar evidencia
+          </ion-button>
+
+        </ion-card-content>
+
+      </ion-card>
+
+    }
+
+  }
+
+</ion-content>
