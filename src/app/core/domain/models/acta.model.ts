@@ -1,6 +1,6 @@
 
-import { Dignidad } from './candidato.model';
-import { EstadoRegistro } from './junta.model';
+import type { Dignidad } from './candidato.model';
+import type { EstadoRegistro } from './junta.model';
 
 export interface Acta {
   id: string;

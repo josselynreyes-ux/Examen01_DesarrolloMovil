@@ -1,4 +1,3 @@
-
 import type { Routes } from '@angular/router';
 
 import { rolGuard } from './core/application/guards/rol.guard';
@@ -108,6 +107,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./presentation/recinto/recinto.page')
         .then(m => m.RecintoPage)
+  },
+
+  {
+    path: 'recinto/actas',
+    canActivate: [rolGuard],
+    data: {
+      roles: ['coordinador_recinto']
+    },
+    loadComponent: () =>
+      import('./presentation/recinto/actas/actas.page')
+        .then(m => m.ActasPage)
   },
 
   {

@@ -13,13 +13,17 @@ import {
   IonToolbar
 } from '@ionic/angular';
 
+
 import type { Acta } from '../../../core/domain/models/acta.model';
 import type { Junta } from '../../../core/domain/models/junta.model';
 import { CamaraService } from '../../../core/infrastructure/capacitor/camara.service';
 import type { Ubicacion } from '../../../core/infrastructure/capacitor/geolocalizacion.service';
 import { GeolocalizacionService } from '../../../core/infrastructure/capacitor/geolocalizacion.service';
+import { ActaConsultaDatosRepository } from '../../../core/infrastructure/repositories/actaconsulta-datos.repository';
+import { AsignacionConsultaDatosRepository } from '../../../core/infrastructure/repositories/asignacionconsulta-datos.repository';
+import { EvidenciaDatosRepository } from '../../../core/infrastructure/repositories/evidencia-datos.repository';
+import { JuntaDatosRepository } from '../../../core/infrastructure/repositories/junta-datos.repository';
 import { AuthService } from '../../../core/infrastructure/supabase/auth.service';
-import { supabase } from '../../../core/infrastructure/supabase/supabase.client';
 
 @Component({
   selector: 'app-evidencias',
@@ -37,6 +41,11 @@ import { supabase } from '../../../core/infrastructure/supabase/supabase.client'
   styleUrls: ['./evidencias.page.scss']
 })
 export class EvidenciasPage implements OnInit, OnDestroy {
+  private readonly repoActaConsulta = inject(ActaConsultaDatosRepository);
+  private readonly repoAsignacionConsulta = inject(AsignacionConsultaDatosRepository);
+  private readonly repoEvidencia = inject(EvidenciaDatosRepository);
+  private readonly repoJunta = inject(JuntaDatosRepository);
+
 
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -95,12 +104,7 @@ export class EvidenciasPage implements OnInit, OnDestroy {
       }
 
       const { data: asignaciones, error } =
-        await supabase
-          .from('asignaciones')
-          .select('junta_id')
-          .eq('veedor_id', perfil.id)
-          .eq('activa', true)
-          .abortSignal(AbortSignal.timeout(15000));
+        await this.repoAsignacionConsulta.juntasDelVeedor(perfil.id);
 
       if (error) throw error;
 
@@ -117,18 +121,9 @@ export class EvidenciasPage implements OnInit, OnDestroy {
 
       const [rActas, rJuntas] = await Promise.all([
 
-        supabase
-          .from('actas')
-          .select('*')
-          .in('junta_id', ids)
-          .in('estado', ['registrada', 'corregida'])
-          .abortSignal(AbortSignal.timeout(15000)),
+        this.repoActaConsulta.actasRegistradas(ids),
 
-        supabase
-          .from('juntas')
-          .select('*')
-          .in('id', ids)
-          .abortSignal(AbortSignal.timeout(15000))
+        this.repoJunta.juntasPorIds2(ids)
 
       ]);
 
@@ -181,10 +176,7 @@ export class EvidenciasPage implements OnInit, OnDestroy {
 
       try {
 
-        const { data, error } = await supabase
-          .storage
-          .from('actas-electorales')
-          .createSignedUrl(acta.foto_ruta, 300);
+        const { data, error } = await this.repoEvidencia.urlFirmada(acta.foto_ruta, 300);
 
         if (error) throw error;
 
@@ -202,12 +194,13 @@ export class EvidenciasPage implements OnInit, OnDestroy {
     }
   }
 
-  async tomarFoto(): Promise<void> {
+    async tomarFoto(): Promise<void> {
 
     if (this.ocupado()) return;
 
     this.capturando.set(true);
     this.mensajeError.set('');
+    this.mensajeExito.set('');
 
     try {
 
@@ -217,9 +210,14 @@ export class EvidenciasPage implements OnInit, OnDestroy {
       this.liberarFoto();
 
       this.archivoFoto = foto;
+
       this.urlTemporal = URL.createObjectURL(foto);
 
       this.fotoPreview.set(this.urlTemporal);
+
+      this.mensajeExito.set(
+        'Fotografía aceptada. La nitidez es suficiente.'
+      );
 
     } catch (error) {
 
@@ -230,6 +228,7 @@ export class EvidenciasPage implements OnInit, OnDestroy {
       this.capturando.set(false);
 
     }
+
   }
 
   async obtenerUbicacion(): Promise<void> {
@@ -293,25 +292,13 @@ export class EvidenciasPage implements OnInit, OnDestroy {
 
     try {
 
-      const { error: errorFoto } = await supabase
-        .storage
-        .from('actas-electorales')
-        .upload(ruta, archivo, {
-          contentType: 'image/jpeg',
-          upsert: false
-        });
+      const { error: errorFoto } = await this.repoEvidencia.subir(ruta, archivo);
 
       if (errorFoto) throw errorFoto;
 
       fotografiaSubida = true;
 
-      const { error: errorActa } = await supabase
-        .rpc('guardar_evidencia_acta', {
-          p_acta_id: acta.id,
-          p_foto_ruta: ruta,
-          p_latitud: ubicacion.latitud,
-          p_longitud: ubicacion.longitud
-        });
+      const { error: errorActa } = await this.repoEvidencia.guardar(acta.id, ruta, ubicacion.latitud, ubicacion.longitud);
 
       if (errorActa) throw errorActa;
 
@@ -319,10 +306,7 @@ export class EvidenciasPage implements OnInit, OnDestroy {
 
       if (acta.foto_ruta) {
 
-        const { error } = await supabase
-          .storage
-          .from('actas-electorales')
-          .remove([acta.foto_ruta]);
+        const { error } = await this.repoEvidencia.eliminar(acta.foto_ruta);
 
         if (error) console.error(error);
 
@@ -344,10 +328,7 @@ export class EvidenciasPage implements OnInit, OnDestroy {
 
       if (fotografiaSubida && !evidenciaGuardada) {
 
-        const { error: limpiezaError } = await supabase
-          .storage
-          .from('actas-electorales')
-          .remove([ruta]);
+        const { error: limpiezaError } = await this.repoEvidencia.eliminar(ruta);
 
         if (limpiezaError) {
           console.error(limpiezaError);

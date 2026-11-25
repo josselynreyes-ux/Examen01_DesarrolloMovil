@@ -54,7 +54,7 @@
 
     <div class="cargando">
       <ion-spinner name="crescent"></ion-spinner>
-      <p>Cargando informaciÃ³n...</p>
+      <p>Cargando información...</p>
     </div>
 
   } @else {
@@ -82,7 +82,7 @@
         fill="outline"
         (click)="cargarDatos()"
       >
-        Actualizar informaciÃ³n
+        Actualizar información
       </ion-button>
 
       @for (junta of juntas(); track junta.id) {
@@ -102,7 +102,7 @@
             </span>
 
             <p>
-              AlcaldÃ­a:
+              Alcaldía:
               {{ estadoActa(junta.id, 'alcalde') }}
             </p>
 
@@ -129,7 +129,7 @@
             <h2>Sin juntas asignadas</h2>
 
             <p>
-              El coordinador de recinto todavÃ­a
+              El coordinador de recinto todavía
               no te ha asignado una JRV.
             </p>
 
@@ -151,7 +151,7 @@
         color="danger"
         (click)="cerrarSesion()"
       >
-        Cerrar sesiÃ³n
+        Cerrar sesión
       </ion-button>
 
     }
@@ -174,7 +174,7 @@
         <ion-card>
           <ion-card-content>
 
-            <h2>Acta de alcaldÃ­a</h2>
+            <h2>Acta de alcaldía</h2>
 
             <p>
               Estado:
@@ -234,7 +234,7 @@
           {{ actaExistente() ? 'Corregir' : 'Registrar' }}
           acta de
           {{ dignidad() === 'alcalde'
-            ? 'alcaldÃ­a'
+            ? 'alcaldía'
             : 'prefectura' }}
         </h2>
 
@@ -243,9 +243,9 @@
         <ion-card>
           <ion-card-content>
 
-            <h2>Votos por organizaciÃ³n</h2>
+            <h2>Votos por organización</h2>
 
-            @for (voto of votos(); track voto.organizacion_id) {
+            @for (voto of votos(); track voto.organizacion_id; let i = $index) {
 
               <div class="campo">
 
@@ -259,12 +259,7 @@
                     type="number"
                     min="0"
                     step="1"
-                    [ngModel]="voto.votos"
-                    (ngModelChange)="actualizarVoto(
-                      voto.organizacion_id,
-                      $event
-                    )"
-                    [disabled]="guardando()">
+                    [formControl]="formulario.controls.votos.at(i)">
                   </ion-input>
 
                 </ion-item>
@@ -282,11 +277,7 @@
                   type="number"
                   min="0"
                   step="1"
-                  [ngModel]="votosBlancos()"
-                  (ngModelChange)="votosBlancos.set(
-                    convertirNumero($event)
-                  )"
-                  [disabled]="guardando()">
+                  [formControl]="formulario.controls.votos_blancos">
                 </ion-input>
               </ion-item>
 
@@ -301,11 +292,7 @@
                   type="number"
                   min="0"
                   step="1"
-                  [ngModel]="votosNulos()"
-                  (ngModelChange)="votosNulos.set(
-                    convertirNumero($event)
-                  )"
-                  [disabled]="guardando()">
+                  [formControl]="formulario.controls.votos_nulos">
                 </ion-input>
               </ion-item>
 
@@ -320,11 +307,7 @@
                   type="number"
                   min="0"
                   step="1"
-                  [ngModel]="totalSufragantes()"
-                  (ngModelChange)="totalSufragantes.set(
-                    convertirNumero($event)
-                  )"
-                  [disabled]="guardando()">
+                  [formControl]="formulario.controls.total_sufragantes">
                 </ion-input>
               </ion-item>
 
@@ -336,10 +319,10 @@
         <ion-card>
           <ion-card-content>
 
-            <h2>ValidaciÃ³n del acta</h2>
+            <h2>Validación del acta</h2>
 
             <div class="fila">
-              <span>Votos vÃ¡lidos</span>
+              <span>Votos válidos</span>
               <strong>{{ totalValidos() }}</strong>
             </div>
 
@@ -377,7 +360,7 @@
             } @else {
 
               <p class="mensaje-error">
-                Ingresa nÃºmeros enteros no negativos
+                Ingresa números enteros no negativos
                 y verifica que la suma coincida
                 con el total de sufragantes.
               </p>
@@ -399,7 +382,7 @@
               } @else {
 
                 {{ actaExistente()
-                  ? 'Guardar correcciÃ³n'
+                  ? 'Guardar corrección'
                   : 'Guardar acta' }}
 
               }

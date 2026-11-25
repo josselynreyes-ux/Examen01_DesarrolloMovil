@@ -16,7 +16,9 @@ import {
 
 import type { Junta } from '../../../../core/domain/models/junta.model';
 import type { Recinto } from '../../../../core/domain/models/recinto.model';
-import { supabase } from '../../../../core/infrastructure/supabase/supabase.client';
+import { JuntaDatosRepository } from '../../../../core/infrastructure/repositories/junta-datos.repository';
+import { RecintoDatosRepository } from '../../../../core/infrastructure/repositories/recinto-datos.repository';
+
 
 @Component({
   selector: 'app-juntas',
@@ -35,6 +37,9 @@ import { supabase } from '../../../../core/infrastructure/supabase/supabase.clie
   styleUrls: ['./juntas.page.scss']
 })
 export class JuntasPage implements OnInit {
+  private readonly repoJunta = inject(JuntaDatosRepository);
+  private readonly repoRecinto = inject(RecintoDatosRepository);
+
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -69,12 +74,7 @@ export class JuntasPage implements OnInit {
 
     try {
       const { data: recinto, error: errorRecinto } =
-        await supabase
-          .from('recintos')
-          .select('*')
-          .eq('id', this.recintoId)
-          .abortSignal(AbortSignal.timeout(15000))
-          .single();
+        await this.repoRecinto.obtenerRecintos(this.recintoId);
 
       if (errorRecinto) {
         throw errorRecinto;
@@ -83,12 +83,7 @@ export class JuntasPage implements OnInit {
       this.recinto.set(recinto as Recinto);
 
       const { data: juntas, error: errorJuntas } =
-        await supabase
-          .from('juntas')
-          .select('*')
-          .eq('recinto_id', this.recintoId)
-          .order('numero_jrv', { ascending: true })
-          .abortSignal(AbortSignal.timeout(15000));
+        await this.repoJunta.juntasDelRecinto(this.recintoId);
 
       if (errorJuntas) {
         throw errorJuntas;

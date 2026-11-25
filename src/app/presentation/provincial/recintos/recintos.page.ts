@@ -21,7 +21,9 @@ import {
 } from '@ionic/angular';
 
 import type { Recinto } from '../../../core/domain/models/recinto.model';
-import { supabase } from '../../../core/infrastructure/supabase/supabase.client';
+import { JuntaDatosRepository } from '../../../core/infrastructure/repositories/junta-datos.repository';
+import { RecintoDatosRepository } from '../../../core/infrastructure/repositories/recinto-datos.repository';
+
 
 @Component({
   selector: 'app-recintos',
@@ -42,6 +44,9 @@ import { supabase } from '../../../core/infrastructure/supabase/supabase.client'
   styleUrls: ['./recintos.page.scss']
 })
 export class RecintosPage implements OnInit {
+  private readonly repoJunta = inject(JuntaDatosRepository);
+  private readonly repoRecinto = inject(RecintoDatosRepository);
+
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -82,11 +87,7 @@ export class RecintosPage implements OnInit {
     this.mensajeError.set('');
 
     try {
-      const { data, error } = await supabase
-        .from('recintos')
-        .select('*')
-        .order('nombre', { ascending: true })
-        .abortSignal(AbortSignal.timeout(15000));
+      const { data, error } = await this.repoRecinto.listarRecintos();
 
       if (error) {
         throw error;
@@ -182,13 +183,7 @@ export class RecintosPage implements OnInit {
       if (id) {
 
         const { data: juntas, error: errorJuntas } =
-          await supabase
-            .from('juntas')
-            .select('numero_jrv')
-            .eq('recinto_id', id)
-            .order('numero_jrv', { ascending: false })
-            .limit(1)
-            .abortSignal(AbortSignal.timeout(15000));
+          await this.repoJunta.ultimoNumero(id);
 
         if (errorJuntas) {
           throw errorJuntas;
@@ -202,12 +197,7 @@ export class RecintosPage implements OnInit {
           );
         }
 
-        const { data, error } = await supabase
-          .from('recintos')
-          .update(recintoDatos)
-          .eq('id', id)
-          .select('id')
-          .abortSignal(AbortSignal.timeout(15000));
+        const { data, error } = await this.repoRecinto.actualizarRecintos(recintoDatos, id);
 
         if (error) {
           throw error;
@@ -223,10 +213,7 @@ export class RecintosPage implements OnInit {
 
       } else {
 
-        const { error } = await supabase
-          .from('recintos')
-          .insert(recintoDatos)
-          .abortSignal(AbortSignal.timeout(15000));
+        const { error } = await this.repoRecinto.crearRecintos(recintoDatos);
 
         if (error) {
           throw error;
@@ -266,11 +253,7 @@ export class RecintosPage implements OnInit {
         throw new Error('La cantidad de JRV no es válida.');
       }
 
-      const { data, error } = await supabase
-        .from('juntas')
-        .select('numero_jrv')
-        .eq('recinto_id', recinto.id)
-        .abortSignal(AbortSignal.timeout(15000));
+      const { data, error } = await this.repoJunta.numerosDelRecinto(recinto.id);
 
       if (error) {
         throw error;
@@ -280,7 +263,7 @@ export class RecintosPage implements OnInit {
         (data ?? []).map(junta => Number(junta.numero_jrv))
       );
 
-      const nuevasJuntas = [];
+      const nuevasJuntas: { recinto_id: string; numero_jrv: number; estado: 'pendiente' }[] = [];
 
       for (let numero = 1; numero <= cantidad; numero++) {
 
@@ -297,13 +280,7 @@ export class RecintosPage implements OnInit {
 
       if (nuevasJuntas.length > 0) {
 
-        const { error: insertarError } = await supabase
-          .from('juntas')
-          .upsert(nuevasJuntas, {
-            onConflict: 'recinto_id,numero_jrv',
-            ignoreDuplicates: true
-          })
-          .abortSignal(AbortSignal.timeout(15000));
+        const { error: insertarError } = await this.repoJunta.generarJuntas(nuevasJuntas);
 
         if (insertarError) {
           throw insertarError;

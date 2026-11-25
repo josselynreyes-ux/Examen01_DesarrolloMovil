@@ -1,9 +1,9 @@
-
 import { Injectable } from '@angular/core';
-
-import { supabase } from './supabase.client';
+import type { Session } from '@supabase/supabase-js';
 
 import type { Perfil } from '../../domain/models/perfil.model';
+
+import { supabase } from './supabase.client';
 
 @Injectable({
   providedIn: 'root'
@@ -15,25 +15,40 @@ export class AuthService {
     contrasena: string
   ): Promise<void> {
 
-    const { data, error } = await supabase.functions.invoke(
-      'login-cedula',
-      {
-        body: { cedula, contrasena }
-      }
-    );
+    const { data, error } =
+      await supabase.functions.invoke(
+        'login-cedula',
+        {
+          body: { cedula, contrasena }
+        }
+      );
 
-    if (error || !data?.access_token || !data?.refresh_token) {
-      throw new Error('Cédula o contraseña incorrecta');
+    if (
+      error ||
+      !data?.access_token ||
+      !data?.refresh_token
+    ) {
+
+      throw new Error(
+        'Cédula o contraseña incorrecta'
+      );
+
     }
 
     const { error: sessionError } =
       await supabase.auth.setSession({
+
         access_token: data.access_token,
         refresh_token: data.refresh_token
+
       });
 
     if (sessionError) {
-      throw new Error('No se pudo establecer la sesión');
+
+      throw new Error(
+        'No se pudo establecer la sesión'
+      );
+
     }
 
   }
@@ -44,17 +59,24 @@ export class AuthService {
       await supabase.auth.getUser();
 
     if (authError || !usuario.user) {
+
       return null;
+
     }
 
     const { data, error } = await supabase
+
       .from('perfiles')
       .select('*')
       .eq('id', usuario.user.id)
       .single();
 
     if (error) {
-      throw new Error('No se pudo obtener el perfil');
+
+      throw new Error(
+        'No se pudo obtener el perfil'
+      );
+
     }
 
     return data as Perfil;
@@ -71,9 +93,11 @@ export class AuthService {
       );
 
     if (error) {
+
       throw new Error(
         'No se pudo solicitar el código. Intenta nuevamente más tarde.'
       );
+
     }
 
   }
@@ -85,15 +109,19 @@ export class AuthService {
 
     const { data, error } =
       await supabase.auth.verifyOtp({
+
         email: correo.trim(),
         token: codigo.trim(),
         type: 'recovery'
+
       });
 
     if (error || !data.session) {
+
       throw new Error(
         'El código es incorrecto o ha expirado'
       );
+
     }
 
   }
@@ -104,33 +132,52 @@ export class AuthService {
 
     const { error } =
       await supabase.auth.updateUser({
+
         password: contrasena
+
       });
 
     if (error) {
+
       throw new Error(
         'No se pudo actualizar la contraseña. Verifica que sea diferente de la anterior.'
       );
+
     }
 
   }
 
   async cerrarSesion(): Promise<void> {
 
-    const { error } = await supabase.auth.signOut();
+    const { error } =
+      await supabase.auth.signOut();
 
     if (error) {
-      throw new Error('No se pudo cerrar sesión');
+
+      throw new Error(
+        'No se pudo cerrar sesión'
+      );
+
     }
 
   }
 
-  async obtenerSesion() {
+  async obtenerSesion(): Promise<Session | null> {
 
-    const { data } = await supabase.auth.getSession();
+    const { data } =
+      await supabase.auth.getSession();
 
     return data.session;
 
+  }
+
+  async cambiarClaveObligatoria(clave: string): Promise<void> {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) throw new Error('Sesión no válida');
+    const { error: claveError } = await supabase.auth.updateUser({ password: clave });
+    if (claveError) throw new Error(claveError.message);
+    const { error: perfilError } = await supabase.rpc('confirmar_cambio_clave');
+    if (perfilError) throw new Error('La contraseña cambió, pero no se pudo actualizar el perfil');
   }
 
 }

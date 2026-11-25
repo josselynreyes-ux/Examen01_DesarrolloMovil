@@ -1,4 +1,3 @@
-
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>Resultados electorales</ion-title>
@@ -31,6 +30,7 @@
         <ion-item>
 
           <ion-select
+            aria-label="Recinto electoral"
             [ngModel]="recintoSeleccionado()"
             (ngModelChange)="cambiarRecinto($event)"
           >
@@ -60,6 +60,7 @@
         <ion-item>
 
           <ion-select
+            aria-label="Dignidad electoral"
             [ngModel]="dignidad()"
             (ngModelChange)="cambiarDignidad($event)"
           >
@@ -125,7 +126,7 @@
 
       <div class="dato">
         <strong>{{ totalActas() }}</strong>
-        <span>Actas registradas</span>
+        <span>Actas registradas y corregidas</span>
       </div>
 
       <div class="dato">
@@ -233,7 +234,7 @@
 
         } @else {
 
-          @for (resultado of resultados(); track resultado.organizacion; let i = $index) {
+          @for (resultado of resultados(); track $index; let i = $index) {
 
             <div class="resultado">
 
@@ -278,6 +279,248 @@
 
       </ion-card-content>
     </ion-card>
+
+    <!-- NUEVA SECCIÓN DE EVIDENCIAS -->
+
+    <h2>Evidencias electorales</h2>
+
+    <p>
+      Consulta las fotografías y coordenadas GPS
+      de las actas registradas en los recintos electorales.
+    </p>
+
+    <div class="resumen">
+
+      <div class="dato dato-completo">
+
+        <strong>{{ evidenciasCompletas() }}</strong>
+
+        <span>Evidencias completas</span>
+
+      </div>
+
+      <div class="dato dato-pendiente">
+
+        <strong>{{ evidenciasPendientes() }}</strong>
+
+        <span>Evidencias pendientes</span>
+
+      </div>
+
+    </div>
+
+    @for (acta of actasEvidencias(); track acta.id) {
+
+      <ion-card class="tarjeta-evidencia">
+
+        <ion-card-content>
+
+          <div class="encabezado-evidencia">
+
+            <h3>
+              JRV N.º {{ numeroJunta(acta.junta_id) }}
+            </h3>
+
+            <span
+              class="estado"
+              [class.registrada]="acta.estado === 'registrada'"
+              [class.corregida]="acta.estado === 'corregida'"
+            >
+              {{ acta.estado === 'corregida'
+                ? 'Corregida'
+                : 'Registrada' }}
+            </span>
+
+          </div>
+
+          <p class="nombre-recinto">
+            {{ nombreRecinto(acta.junta_id) }}
+          </p>
+
+          <p>
+            Dignidad:
+            {{ acta.dignidad === 'alcalde'
+              ? 'Alcaldía'
+              : 'Prefectura' }}
+          </p>
+
+          <div
+            class="estado-evidencia"
+            [class.completa]="evidenciaCompleta(acta)"
+            [class.incompleta]="!evidenciaCompleta(acta)"
+          >
+
+            {{ evidenciaCompleta(acta)
+              ? 'Evidencia completa'
+              : 'Evidencia pendiente' }}
+
+          </div>
+
+          <div class="fila">
+
+            <span>Total sufragantes</span>
+
+            <strong>{{ acta.total_sufragantes }}</strong>
+
+          </div>
+
+          <!-- FOTOGRAFÍA -->
+
+          <div class="seccion-evidencia">
+
+            <h3>Fotografía del acta</h3>
+
+            @if (acta.foto_ruta) {
+
+              @if (actaSeleccionada()?.id === acta.id) {
+
+                @if (cargandoFoto()) {
+
+                  <div class="cargando-foto">
+
+                    <ion-spinner name="crescent">
+                    </ion-spinner>
+
+                    <p>Cargando fotografía...</p>
+
+                  </div>
+
+                }
+
+                @if (mensajeErrorFoto()) {
+
+                  <p class="mensaje-error">
+                    {{ mensajeErrorFoto() }}
+                  </p>
+
+                  <ion-button
+                    expand="block"
+                    fill="outline"
+                    (click)="verFotografia(acta)"
+                  >
+                    Volver a intentar
+                  </ion-button>
+
+                }
+
+                @if (fotoUrl()) {
+
+                  <div class="contenedor-foto">
+
+                    <img
+                      [src]="fotoUrl()"
+                      alt="Fotografía del acta electoral"
+                      (error)="errorImagen()"
+                    />
+
+                  </div>
+
+                  <ion-button
+                    expand="block"
+                    fill="outline"
+                    [href]="fotoUrl()"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Ver fotografía completa
+                  </ion-button>
+
+                }
+
+                <ion-button
+                  expand="block"
+                  fill="outline"
+                  color="medium"
+                  (click)="cerrarFotografia()"
+                >
+                  Ocultar fotografía
+                </ion-button>
+
+              } @else {
+
+                <p>Fotografía registrada en el sistema.</p>
+
+                <ion-button
+                  expand="block"
+                  (click)="verFotografia(acta)"
+                >
+                  Ver fotografía
+                </ion-button>
+
+              }
+
+            } @else {
+
+              <p class="advertencia">
+                Esta acta todavía no tiene
+                fotografía registrada.
+              </p>
+
+            }
+
+          </div>
+
+          <!-- GEOLOCALIZACIÓN -->
+
+          <div class="seccion-evidencia">
+
+            <h3>Ubicación de la evidencia</h3>
+
+            @if (tieneUbicacion(acta)) {
+
+              <div class="fila">
+
+                <span>Latitud</span>
+
+                <strong>
+                  {{ acta.latitud?.toFixed(6) }}
+                </strong>
+
+              </div>
+
+              <div class="fila">
+
+                <span>Longitud</span>
+
+                <strong>
+                  {{ acta.longitud?.toFixed(6) }}
+                </strong>
+
+              </div>
+
+              <ion-button
+                expand="block"
+                fill="outline"
+                [href]="enlaceUbicacion(acta)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ver ubicación en Google Maps
+              </ion-button>
+
+            } @else {
+
+              <p class="advertencia">
+                No existen coordenadas GPS válidas
+                registradas para esta acta.
+              </p>
+
+            }
+
+          </div>
+
+        </ion-card-content>
+
+      </ion-card>
+
+    } @empty {
+
+      <p class="informacion">
+        No existen actas para consultar evidencias
+        con los filtros seleccionados.
+      </p>
+
+    }
 
     <p class="nota">
 

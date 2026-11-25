@@ -22,9 +22,10 @@ import {
   IonToolbar
 } from '@ionic/angular';
 
+
 import type { Candidato, Dignidad } from '../../../core/domain/models/candidato.model';
 import type { Organizacion } from '../../../core/domain/models/organizacion.model';
-import { supabase } from '../../../core/infrastructure/supabase/supabase.client';
+import { CatalogoDatosRepository } from '../../../core/infrastructure/repositories/catalogo-datos.repository';
 
 @Component({
   selector: 'app-organizaciones',
@@ -47,6 +48,8 @@ import { supabase } from '../../../core/infrastructure/supabase/supabase.client'
   styleUrls: ['./organizaciones.page.scss']
 })
 export class OrganizacionesPage implements OnInit {
+  private readonly repoCatalogo = inject(CatalogoDatosRepository);
+
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -100,17 +103,9 @@ export class OrganizacionesPage implements OnInit {
       const [rOrganizaciones, rCandidatos] =
         await Promise.all([
 
-          supabase
-            .from('organizaciones')
-            .select('*')
-            .order('nombre')
-            .abortSignal(AbortSignal.timeout(15000)),
+          this.repoCatalogo.listarOrganizaciones(),
 
-          supabase
-            .from('candidatos')
-            .select('*')
-            .order('nombre')
-            .abortSignal(AbortSignal.timeout(15000))
+          this.repoCatalogo.listarCandidatos()
 
         ]);
 
@@ -210,12 +205,7 @@ export class OrganizacionesPage implements OnInit {
 
       if (id) {
 
-        const { data, error } = await supabase
-          .from('organizaciones')
-          .update(organizacion)
-          .eq('id', id)
-          .select('id')
-          .abortSignal(AbortSignal.timeout(15000));
+        const { data, error } = await this.repoCatalogo.actualizarOrganizaciones(organizacion, id);
 
         if (error) {
           throw error;
@@ -233,10 +223,7 @@ export class OrganizacionesPage implements OnInit {
 
       } else {
 
-        const { error } = await supabase
-          .from('organizaciones')
-          .insert(organizacion)
-          .abortSignal(AbortSignal.timeout(15000));
+        const { error } = await this.repoCatalogo.crearOrganizaciones(organizacion);
 
         if (error) {
           throw error;
@@ -336,12 +323,7 @@ export class OrganizacionesPage implements OnInit {
 
       if (id) {
 
-        const { data, error } = await supabase
-          .from('candidatos')
-          .update(candidato)
-          .eq('id', id)
-          .select('id')
-          .abortSignal(AbortSignal.timeout(15000));
+        const { data, error } = await this.repoCatalogo.actualizarCandidatos(candidato, id);
 
         if (error) {
           throw error;
@@ -359,10 +341,7 @@ export class OrganizacionesPage implements OnInit {
 
       } else {
 
-        const { error } = await supabase
-          .from('candidatos')
-          .insert(candidato)
-          .abortSignal(AbortSignal.timeout(15000));
+        const { error } = await this.repoCatalogo.crearCandidatos(candidato);
 
         if (error) {
           throw error;
