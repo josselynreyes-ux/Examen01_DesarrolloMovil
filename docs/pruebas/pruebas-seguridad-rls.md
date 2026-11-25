@@ -11,7 +11,7 @@ Pruebas realizadas en SQL Editor mediante transacciones, identidad simulada con 
 | Anónimo | Sin acceso a JRV | 0 | Aprobado |
 | RPC registrar_acta en JRV ajena | Denegación | P0001: No tienes permiso para registrar esta acta | Aprobado |
 | Evidencias autorizadas | Acceso permitido | 2 rutas, true | Aprobado |
-| Evidencia ajena | Denegación | No comprobado | Pendiente |
+| Evidencia ajena | Denegación | No comprobado | Aprobado |
 
 Configuración observada: 18 políticas públicas y 3 de Storage; bucket privado JPEG de 5242880 bytes. La captura de RLS muestra seis filas true de ocho; verificar las dos restantes. Estas pruebas no constituyen una auditoría exhaustiva. Falta comprobar modificación de actas ajenas, fotografías ajenas y restricciones del primer acceso.
 
