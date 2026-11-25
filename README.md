@@ -243,3 +243,21 @@ Escuela Politécnica Nacional — Escuela de Formación de Tecnólogos
 Carrera de Desarrollo de Software  
 Desarrollo de Aplicaciones Móviles — Grupo 4  
 Noviembre de 2026
+
+## 15. Descarga del APK 
+
+La aplicación Control Electoral está disponible para dispositivos Android.
+
+**Versión:** 1.0.0
+
+[Descargar APK de Control Electoral](https://github.com/josselynreyes-ux/Examen01_DesarrolloMovil/releases/latest)
+
+### Instrucciones de instalación
+
+1. Descargar el archivo APK desde GitHub Releases.
+2. Transferir el archivo al dispositivo Android.
+3. Autorizar la instalación desde fuentes externas, si el dispositivo lo solicita.
+4. Instalar y abrir la aplicación.
+5. Iniciar sesión con las credenciales de demostración.
+
+La aplicación requiere conexión a Internet.
