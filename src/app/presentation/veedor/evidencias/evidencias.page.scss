@@ -1,30 +1,30 @@
 
 ion-content {
-  --background: #eef2f8;
+  --background: #fcfaf7;
 }
 
 h1 {
   font-size: 25px;
   font-weight: bold;
-  color: #173d70;
+  color: #36553a;
 }
 
 h2 {
   font-size: 19px;
   font-weight: 600;
-  color: #173d70;
+  color: #36553a;
   margin-bottom: 12px;
 }
 
 p {
   font-size: 14px;
-  color: #64748b;
+  color: #59675c;
   overflow-wrap: anywhere;
 }
 
 ion-card {
   margin: 15px 0;
-  border-radius: 12px;
+  border-radius: 18px;
 }
 
 ion-card-content {
@@ -47,7 +47,7 @@ ion-button ion-spinner {
   width: 100%;
   max-height: 400px;
   object-fit: contain;
-  background: #e2e8f0;
+  background: #e5ebe1;
   border-radius: 10px;
   margin: 15px 0;
 }
@@ -57,16 +57,16 @@ ion-button ion-spinner {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
-  border: 2px dashed #cbd5e1;
+  background: #edf4e5;
+  border: 2px dashed #d5dfd0;
   border-radius: 10px;
-  color: #64748b;
+  color: #59675c;
   text-align: center;
 }
 
 .coordenadas {
-  background: #dbeafe;
-  border-radius: 8px;
+  background: #f8dfe7;
+  border-radius: 12px;
   padding: 12px;
 }
 
@@ -98,12 +98,12 @@ ion-button ion-spinner {
   background: #fee2e2;
   color: #991b1b;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .mensaje-exito {
   background: #dcfce7;
   color: #166534;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }

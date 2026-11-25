@@ -34,4 +34,20 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* Tema claro fijo: evita texto blanco sobre campos claros en Android. */
+
+/* Identidad visual Control Electoral */
+:root { color-scheme: light; }
+ion-content { --background: #fcfaf7; --color: #29382f; }
+ion-toolbar { --background: #dcebcB; --color: #29382f; }
+ion-toolbar.ion-color-primary { --ion-color-base: #dcebcB; --ion-color-contrast: #29382f; }
+ion-title { font-weight: 700; letter-spacing: -0.3px; }
+ion-card { --background: #fff; --color: #29382f; border: 1px solid #e3e9df; border-radius: 20px; box-shadow: 0 4px 16px rgba(41,56,47,.07); }
+ion-item { --background: #fff; --color: #29382f; --border-color: #d5dfd0; --highlight-color-focused: #52734d; }
+ion-input, ion-textarea, ion-select { --color: #29382f; color: #29382f; --placeholder-color: #59675c; --placeholder-opacity: 1; }
+ion-input input, ion-textarea textarea { color: #29382f; -webkit-text-fill-color: #29382f; caret-color: #52734d; }
+ion-select::part(text) { color: #29382f; }
+ion-select::part(placeholder) { color: #59675c; opacity: 1; }
+ion-button { --border-radius: 24px; --box-shadow: none; min-height: 44px; font-weight: 600; letter-spacing: .1px; text-transform: none; }
+ion-button:focus-visible { outline: 2px solid #52734d; outline-offset: 3px; }
+ion-alert, ion-popover, ion-modal { --background: #fff; --ion-text-color: #29382f; }

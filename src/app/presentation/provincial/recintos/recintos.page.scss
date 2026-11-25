@@ -1,25 +1,25 @@
 
 ion-content {
-  --background: #eef2f8;
+  --background: #fcfaf7;
 }
 
 h1 {
   font-size: 24px;
   font-weight: bold;
-  color: #173d70;
+  color: #36553a;
   margin-bottom: 20px;
 }
 
 h2 {
   font-size: 19px;
   font-weight: 600;
-  color: #173d70;
+  color: #36553a;
   margin-bottom: 15px;
 }
 
 ion-card {
   margin: 15px 0;
-  border-radius: 12px;
+  border-radius: 18px;
 }
 
 ion-card-content {
@@ -28,7 +28,7 @@ ion-card-content {
 
 ion-card p {
   font-size: 14px;
-  color: #475569;
+  color: #46594b;
   margin: 8px 0;
 }
 
@@ -50,21 +50,21 @@ ion-button ion-spinner {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #334155;
+    color: #29382f;
     margin-bottom: 7px;
   }
 
   ion-item {
-    --background: #f8fafc;
-    --border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    --background: #ffffff;
+    --border-radius: 12px;
+    border: 1px solid #d5dfd0;
+    border-radius: 12px;
   }
 }
 
 .ayuda {
   font-size: 13px;
-  color: #64748b;
+  color: #59675c;
 }
 
 .cargando {
@@ -76,7 +76,7 @@ ion-button ion-spinner {
   color: #b91c1c;
   background: #fee2e2;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow-wrap: anywhere;
 }
 
@@ -84,7 +84,7 @@ ion-button ion-spinner {
   color: #166534;
   background: #dcfce7;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .acciones {

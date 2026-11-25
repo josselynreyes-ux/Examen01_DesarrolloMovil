@@ -1,24 +1,24 @@
 
 ion-content {
-  --background: #eef2f8;
+  --background: #fcfaf7;
 }
 
 h1 {
   font-size: 24px;
   font-weight: bold;
-  color: #173d70;
+  color: #36553a;
 }
 
 h2 {
   font-size: 19px;
   font-weight: 600;
-  color: #173d70;
+  color: #36553a;
   margin-bottom: 15px;
 }
 
 ion-card {
   margin: 15px 0;
-  border-radius: 12px;
+  border-radius: 18px;
 }
 
 ion-card-content {
@@ -26,7 +26,7 @@ ion-card-content {
 }
 
 ion-card p {
-  color: #475569;
+  color: #46594b;
   font-size: 14px;
   margin: 8px 0;
   overflow-wrap: anywhere;
@@ -48,24 +48,24 @@ ion-button ion-spinner {
 
   label {
     display: block;
-    color: #334155;
+    color: #29382f;
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 7px;
   }
 
   ion-item {
-    --background: #f8fafc;
-    --border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    --background: #ffffff;
+    --border-radius: 12px;
+    border: 1px solid #d5dfd0;
+    border-radius: 12px;
   }
 }
 
 .informacion {
-  background: #dbeafe;
+  background: #f8dfe7;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 15px;
 }
 
@@ -97,12 +97,12 @@ ion-button ion-spinner {
   background: #fee2e2;
   color: #991b1b;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .mensaje-exito {
   background: #dcfce7;
   color: #166534;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }

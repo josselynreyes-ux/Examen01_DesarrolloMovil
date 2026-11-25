@@ -1,2 +1,29 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+
+:root {
+  --ion-background-color: #fcfaf7;
+  --ion-text-color: #29382f;
+  --ion-text-color-rgb: 41, 56, 47;
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+  --ion-font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ion-color-primary: #52734d;
+  --ion-color-primary-rgb: 82, 115, 77;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #486544;
+  --ion-color-primary-tint: #63815f;
+  --ion-color-secondary: #f8dfe7;
+  --ion-color-secondary-rgb: 248, 223, 231;
+  --ion-color-secondary-contrast: #29382f;
+  --ion-color-secondary-contrast-rgb: 41, 56, 47;
+  --ion-color-secondary-shade: #dac4cb;
+  --ion-color-secondary-tint: #f9e2e9;
+  --ion-color-medium: #59675c;
+  --ion-color-medium-rgb: 89, 103, 92;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #4e5b51;
+  --ion-color-medium-tint: #6a766c;
+}

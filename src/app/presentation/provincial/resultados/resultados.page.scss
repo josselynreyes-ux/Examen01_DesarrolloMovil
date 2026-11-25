@@ -1,37 +1,36 @@
-
 ion-content {
-  --background: #eef2f8;
+  --background: #fcfaf7;
 }
 
 h1 {
   font-size: 26px;
   font-weight: bold;
-  color: #173d70;
+  color: #36553a;
 }
 
 h2 {
   font-size: 19px;
   font-weight: 600;
-  color: #173d70;
+  color: #36553a;
   margin-bottom: 15px;
 }
 
 h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #334155;
+  color: #29382f;
   margin: 0;
 }
 
 p {
   font-size: 14px;
-  color: #64748b;
+  color: #59675c;
   overflow-wrap: anywhere;
 }
 
 ion-card {
   margin: 15px 0;
-  border-radius: 12px;
+  border-radius: 18px;
 }
 
 ion-card-content {
@@ -50,15 +49,15 @@ ion-button {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #334155;
+    color: #29382f;
     margin-bottom: 7px;
   }
 
   ion-item {
-    --background: #f8fafc;
-    --border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    --background: #ffffff;
+    --border-radius: 12px;
+    border: 1px solid #d5dfd0;
+    border-radius: 12px;
   }
 }
 
@@ -80,12 +79,12 @@ ion-button {
 
   strong {
     font-size: 30px;
-    color: #173d70;
+    color: #36553a;
   }
 
   span {
     font-size: 13px;
-    color: #64748b;
+    color: #59675c;
     text-align: center;
     margin-top: 5px;
   }
@@ -99,11 +98,11 @@ ion-button {
 
   strong {
     font-size: 36px;
-    color: #173d70;
+    color: #36553a;
   }
 
   span {
-    color: #64748b;
+    color: #59675c;
     font-size: 13px;
   }
 }
@@ -111,8 +110,8 @@ ion-button {
 .barra-fondo {
   width: 100%;
   height: 15px;
-  background: #e2e8f0;
-  border-radius: 8px;
+  background: #e5ebe1;
+  border-radius: 12px;
   overflow: hidden;
   margin: 12px 0;
 }
@@ -120,13 +119,13 @@ ion-button {
 .barra-avance {
   height: 100%;
   background: #16a34a;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .barra-votos {
   height: 100%;
   background: #2563eb;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .segunda {
@@ -141,22 +140,23 @@ ion-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   padding: 14px 0;
-  border-bottom: 1px solid #e2e8f0;
-  color: #334155;
+  border-bottom: 1px solid #e5ebe1;
+  color: #29382f;
 }
 
 .total {
-  background: #dbeafe;
-  color: #173d70;
-  border-radius: 8px;
+  background: #f8dfe7;
+  color: #36553a;
+  border-radius: 12px;
   padding: 15px 10px;
   margin-top: 10px;
 }
 
 .resultado {
   padding: 20px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e5ebe1;
 }
 
 .resultado:last-child {
@@ -171,7 +171,7 @@ ion-button {
 
   strong {
     font-size: 18px;
-    color: #173d70;
+    color: #36553a;
   }
 }
 
@@ -184,14 +184,14 @@ ion-button {
   background: #fee2e2;
   color: #991b1b;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .informacion {
-  background: #dbeafe;
-  color: #173d70;
+  background: #f8dfe7;
+  color: #36553a;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 18px;
 }
 
 .nota {
@@ -200,8 +200,124 @@ ion-button {
   margin: 20px 0;
 }
 
+/* EVIDENCIAS ELECTORALES */
+
+.dato-completo {
+  strong {
+    color: #16a34a;
+  }
+}
+
+.dato-pendiente {
+  strong {
+    color: #d97706;
+  }
+}
+
+.tarjeta-evidencia {
+  border: 1px solid #e5ebe1;
+}
+
+.encabezado-evidencia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  h3 {
+    color: #36553a;
+    font-size: 18px;
+  }
+}
+
+.nombre-recinto {
+  font-weight: 600;
+  color: #29382f;
+  margin-top: 12px;
+}
+
+.estado {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 20px;
+}
+
+.registrada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.corregida {
+  background: #f8dfe7;
+  color: #79435b;
+}
+
+.estado-evidencia {
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin: 15px 0;
+}
+
+.completa {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.incompleta {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.seccion-evidencia {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e5ebe1;
+
+  h3 {
+    margin-bottom: 12px;
+    color: #36553a;
+  }
+}
+
+.contenedor-foto {
+  background: #edf4e5;
+  border: 1px solid #d5dfd0;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 15px 0;
+  text-align: center;
+
+  img {
+    display: block;
+    width: 100%;
+    max-height: 450px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+}
+
+.cargando-foto {
+  text-align: center;
+  padding: 20px;
+}
+
+.advertencia {
+  background: #fff7ed;
+  color: #92400e;
+  border: 1px solid #fed7aa;
+  padding: 12px;
+  border-radius: 18px;
+}
+
 @media (min-width: 768px) {
   .resumen {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+.dato { background: #edf4e5; border: 1px solid #d5dfd0; }
+.dato:nth-child(even) { background: #f8dfe7; border-color: #eed4df; }
