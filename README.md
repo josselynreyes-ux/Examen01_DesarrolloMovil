@@ -261,3 +261,8 @@ La aplicación Control Electoral está disponible para dispositivos Android.
 5. Iniciar sesión con las credenciales de demostración.
 
 La aplicación requiere conexión a Internet.
+
+## 16. Video grupal
+
+Se adjunta el enlace del video realizado para definir los ADR 
+https://youtu.be/2P7KSIag-EA 
